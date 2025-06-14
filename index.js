@@ -54,6 +54,11 @@ app.get('/artifacts/:id',async(req,res)=>{
 
  app.post('/artifacts',async(req,res)=>{
   const payload=req.body;
+
+if (!artifact.likes) {
+        artifact.likes = []; // or 0
+      }
+
   console.log(payload);
   const result=await artifactsCollections.insertOne(payload);
   res.send(result);
@@ -116,6 +121,66 @@ app.put('/artifacts/:id', async (req, res) => {
     res.status(500).send({ message: 'Failed to update artifact' });
   }
 });
+
+
+// Toggle like/dislike an artifact
+app.patch('/artifacts/:id/toggleLike', async (req, res) => {
+  const artifactId = req.params.id;
+  const { email } = req.body;
+
+  try {
+    const artifact = await artifactsCollections.findOne({ _id: new ObjectId(artifactId) });
+    if (!artifact) {
+      return res.status(404).send({ message: 'Artifact not found' });
+    }
+
+    let updatedLikes;
+    let liked;
+
+    if (Array.isArray(artifact.likes) && artifact.likes.includes(email)) {
+      // Dislike
+      updatedLikes = artifact.likes.filter(e => e !== email);
+      liked = false;
+    } else {
+      // Like
+      updatedLikes = Array.isArray(artifact.likes) ? [...artifact.likes, email] : [email];
+      liked = true;
+    }
+
+    await artifactsCollections.updateOne(
+      { _id: new ObjectId(artifactId) },
+      { $set: { likes: updatedLikes } }
+    );
+
+    res.send({
+      liked,
+      likesCount: updatedLikes.length
+    });
+
+  } catch (error) {
+    console.error('Toggle like error:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+});
+
+
+
+// Get all liked artifacts by user email
+app.get('/liked-artifacts', async (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).send({ message: 'Email is required' });
+
+  try {
+    const likedArtifacts = await artifactsCollections
+      .find({ likes: { $in: [email] } })
+      .toArray();
+    res.send(likedArtifacts);
+  } catch (error) {
+    console.error('Failed to fetch liked artifacts:', error);
+    res.status(500).send({ message: 'Internal Server Error' });
+  }
+});
+
 
 
 
