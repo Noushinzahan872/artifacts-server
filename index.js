@@ -34,13 +34,28 @@ async function run() {
 
 const artifactsCollections=client.db('artifactDB').collection('artifacts')
 
-
+// All
 app.get('/artifacts',async(req,res)=>{
   // const cursor=artifactsCollections.find();
   // const result=await cursor.toArray();
   const result=await artifactsCollections.find().toArray();
   res.send(result);
 })
+
+
+// Top LIKED
+app.get('/top-liked-artifacts', async (req, res) => {
+  const result = await artifactsCollections
+    .find({ likes: { $exists: true } })
+    .toArray();
+
+  const sorted = result
+    .sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0))
+    .slice(0, 6);
+
+  res.send(sorted);
+});
+
 
 
 
@@ -55,9 +70,9 @@ app.get('/artifacts/:id',async(req,res)=>{
  app.post('/artifacts',async(req,res)=>{
   const payload=req.body;
 
-if (!artifact.likes) {
-        artifact.likes = []; // or 0
-      }
+if (!payload.likes) {
+      payload.likes = [];
+    }
 
   console.log(payload);
   const result=await artifactsCollections.insertOne(payload);
@@ -165,15 +180,15 @@ app.patch('/artifacts/:id/toggleLike', async (req, res) => {
 
 
 
-// Get all liked artifacts by user email
-app.get('/liked-artifacts', async (req, res) => {
-  const { email } = req.query;
-  if (!email) return res.status(400).send({ message: 'Email is required' });
 
+
+app.get('/liked-artifacts', async (req, res) => {
   try {
+    
     const likedArtifacts = await artifactsCollections
-      .find({ likes: { $in: [email] } })
+      .find({ likes: { $exists: true, $ne: [] } })
       .toArray();
+
     res.send(likedArtifacts);
   } catch (error) {
     console.error('Failed to fetch liked artifacts:', error);
@@ -194,7 +209,6 @@ app.delete('/artifacts/:id',async(req,res)=>{
 
 
 
-    
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
