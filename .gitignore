@@ -1,3 +1,4 @@
 node_modules
 .env
-.vercel
+vercel
+FIREBASE_SERVICE_ACCOUNT.json

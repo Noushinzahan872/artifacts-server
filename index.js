@@ -1,7 +1,6 @@
 
 // 
 // 
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -9,12 +8,72 @@ require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
+const admin = require("firebase-admin");
+
 const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// console.log(process.env.DB_USER)
+
+// Initialize Firebase Admin SDK
+const serviceAccount = require("./FIREBASE_SERVICE_ACCOUNT.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+// JWT verification middleware
+const verifyToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).send({ error: true, message: "Unauthorized" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error("JWT verification failed:", err);
+    return res.status(403).send({ error: true, message: "Forbidden" });
+  }
+};
+
+
+
+
+
+
+// // Initialize Firebase Admin SDK
+// admin.initializeApp({
+//   credential: admin.credential.cert(
+//     JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+//   ),
+// });
+
+// // JWT verification middleware
+// const verifyToken = async (req, res, next) => {
+//   const authHeader = req.headers.authorization;
+
+//   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//     return res.status(401).send({ error: true, message: "Unauthorized" });
+//   }
+
+//   const token = authHeader.split(" ")[1];
+//   try {
+//     const decoded = await admin.auth().verifyIdToken(token);
+//     req.user = decoded;
+//     next();
+//   } catch (err) {
+//     console.error("JWT verification failed:", err);
+//     return res.status(403).send({ error: true, message: "Forbidden" });
+//   }
+// };
+
+
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.yyvxar9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -30,7 +89,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
 const artifactsCollections=client.db('artifactDB').collection('artifacts')
 
@@ -58,7 +117,7 @@ app.get('/top-liked-artifacts', async (req, res) => {
 
 
 
-
+// details er jonno single id diye
 app.get('/artifacts/:id',async(req,res)=>{
   const id=req.params.id;
   const query={_id: new ObjectId(id)}
@@ -80,7 +139,8 @@ if (!payload.likes) {
  })
 
 
-    app.get('/artifact/:email',async(req,res)=>{
+//  my artifacts
+    app.get('/artifact/:email',verifyToken,async(req,res)=>{
       const email=req.params.email;
       const query={adderEmail:email}
       const cursor=artifactsCollections.find(query)
@@ -218,9 +278,6 @@ app.delete('/artifacts/:id',async(req,res)=>{
   }
 }
 run().catch(console.dir);
-
-
-
 
 
 app.get('/',(req,res)=>{
