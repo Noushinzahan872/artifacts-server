@@ -126,7 +126,7 @@ app.get('/artifacts/:id',async(req,res)=>{
 })
 
 
- app.post('/artifacts',async(req,res)=>{
+ app.post('/artifacts',verifyToken,async(req,res)=>{
   const payload=req.body;
 
 if (!payload.likes) {
@@ -165,8 +165,8 @@ if (!payload.likes) {
 });
 
 
-
-app.put('/artifacts/:id', async (req, res) => {
+// update 
+app.put('/artifacts/:id',verifyToken, async (req, res) => {
   const id = req.params.id;
   const filter = { _id: new ObjectId(id) };
   const options = { upsert: true };
@@ -259,7 +259,7 @@ app.get('/liked-artifacts', async (req, res) => {
 
 
 
-app.delete('/artifacts/:id',async(req,res)=>{
+app.delete('/artifacts/:id',verifyToken,async(req,res)=>{
   const id=req.params.id;
   const query={_id: new ObjectId(id)}
   const result=await artifactsCollections.deleteOne(query);
