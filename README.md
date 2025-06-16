@@ -1,75 +1,24 @@
- Artifacts Server
+# 🛠️ Artifacts Server
 
-This is the backend server for the **Artifacts Web Application**. It provides RESTful API endpoints to manage historical artifacts, user authentication, likes system, and more.
-
----
-
-## 🚀 Features
-
-- REST API built with Express.js
-- MongoDB for database
-- Firebase Admin SDK for authentication (if used)
-- CORS enabled
-- Environment variable support using `.env`
+This is the **backend server** for the [Artifacts Web Application](https://github.com/Programming-Hero-Web-Course4/b11a11-client-side-Noushinzahan872). It exposes a RESTful API for managing historical artifacts, user-specific likes, and more.
 
 ---
 
-## 📁 Project Structure
+## ✨ Features
 
-artifacts-server/
-├── index.js # Main entry point
-├── .env # Environment variables (not committed)
-├── package.json # Project metadata and dependencies
-├── README.md # Project documentation (this file)
-
-yaml
-Copy
-Edit
+- 🔗 **RESTful API** using Express.js
+- 🗃️ **MongoDB** for flexible data storage
+- 🔐 Optional **Firebase Admin SDK** for secure authentication
+- ⚙️ Environment variable support via `.env`
+- 🌐 CORS-enabled for frontend integration
 
 ---
 
-## 🛠️ Installation
+## 📦 Installation & Setup
+
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/artifacts-server.git
+git clone https://github.com/Programming-Hero-Web-Course4/b11a11-server-side-Noushinzahan872
 cd artifacts-server
 npm install
-📁 Environment Variables
-Create a .env file in the root directory with your own values:
-
-env
-Copy
-Edit
-PORT=3000
-DB_USER=yourMongoUser
-DB_PASSWORD=yourMongoPassword
-DB_NAME=artifactsDB
-(Add Firebase credentials if you're using Firebase Admin SDK)
-
-▶️ Run the Server
-bash
-Copy
-Edit
-npm start
-Server will run on: http://localhost:3000
-
-📬 API Endpoints
-Method	Endpoint	Description
-GET	/artifacts	Get all artifacts
-GET	/artifacts/:id	Get a single artifact
-POST	/artifacts	Add a new artifact
-PATCH	/artifacts/:id/toggleLike	Like/Unlike artifact
-DELETE	/artifacts/:id	Delete an artifact
-
-🧪 Testing
-You can test the server using:
-
-Postman
-
-Thunder Client (VS Code Extension)
-
-Your frontend React app
-
-👤 Author
-Your Name
-GitHub Profile
