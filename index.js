@@ -45,36 +45,6 @@ const verifyToken = async (req, res, next) => {
 
 
 
-
-
-// // Initialize Firebase Admin SDK
-// admin.initializeApp({
-//   credential: admin.credential.cert(
-//     JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-//   ),
-// });
-
-// // JWT verification middleware
-// const verifyToken = async (req, res, next) => {
-//   const authHeader = req.headers.authorization;
-
-//   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-//     return res.status(401).send({ error: true, message: "Unauthorized" });
-//   }
-
-//   const token = authHeader.split(" ")[1];
-//   try {
-//     const decoded = await admin.auth().verifyIdToken(token);
-//     req.user = decoded;
-//     next();
-//   } catch (err) {
-//     console.error("JWT verification failed:", err);
-//     return res.status(403).send({ error: true, message: "Forbidden" });
-//   }
-// };
-
-
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.yyvxar9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -241,7 +211,6 @@ app.patch('/artifacts/:id/toggleLike', async (req, res) => {
 
 
 
-
 app.get('/liked-artifacts', async (req, res) => {
   try {
     
@@ -258,14 +227,12 @@ app.get('/liked-artifacts', async (req, res) => {
 
 
 
-
 app.delete('/artifacts/:id',verifyToken,async(req,res)=>{
   const id=req.params.id;
   const query={_id: new ObjectId(id)}
   const result=await artifactsCollections.deleteOne(query);
   res.send(result);
 })
-
 
 
     // Send a ping to confirm a successful connection
