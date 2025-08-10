@@ -23,7 +23,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-// JWT verification middleware
+// JWT verification middlewar
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -72,7 +72,7 @@ app.get('/artifacts',async(req,res)=>{
 })
 
 
-// Top LIKED
+// Top Liked
 app.get('/top-liked-artifacts', async (req, res) => {
   const result = await artifactsCollections
     .find({ likes: { $exists: true } })
